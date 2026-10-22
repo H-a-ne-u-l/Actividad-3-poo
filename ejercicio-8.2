@@ -1,1 +1,154 @@
-q
+import tkinter as tk
+from tkinter import messagebox
+import math
+
+
+class Notas:
+    """
+    Clase que define un array de notas numéricas de tipo float (equivalente a double en Java).
+    """
+    def __init__(self):
+        self.listaNotas = [0.0] * 5
+
+    def calcularPromedio(self):
+        suma = sum(self.listaNotas)
+        return suma / len(self.listaNotas)
+
+    def calcularDesviacion(self):
+        prom = self.calcularPromedio()
+        suma = 0.0
+        for nota in self.listaNotas:
+            suma += math.pow(nota - prom, 2)
+        return math.sqrt(suma / len(self.listaNotas))
+
+    def calcularMenor(self):
+        return min(self.listaNotas)
+
+    def calcularMayor(self):
+        return max(self.listaNotas)
+
+
+class VentanaPrincipal(tk.Tk):
+    """
+    Clase que define la interfaz gráfica para gestionar el array de notas.
+    """
+    def __init__(self):
+        super().__init__()
+        self.inicio()
+        self.title("Notas")
+        self.geometry("280x380")
+        self.resizable(False, False)
+        self.eval('tk::PlaceWindow . center')
+
+    def inicio(self):
+        self.nota1 = tk.Label(self, text="Nota 1:", anchor="w")
+        self.nota1.place(x=20, y=20, width=135, height=23)
+        self.campoNota1 = tk.Entry(self)
+        self.campoNota1.place(x=105, y=20, width=135, height=23)
+
+        self.nota2 = tk.Label(self, text="Nota 2:", anchor="w")
+        self.nota2.place(x=20, y=50, width=135, height=23)
+        self.campoNota2 = tk.Entry(self)
+        self.campoNota2.place(x=105, y=50, width=135, height=23)
+
+        self.nota3 = tk.Label(self, text="Nota 3:", anchor="w")
+        self.nota3.place(x=20, y=80, width=135, height=23)
+        self.campoNota3 = tk.Entry(self)
+        self.campoNota3.place(x=105, y=80, width=135, height=23)
+
+        self.nota4 = tk.Label(self, text="Nota 4:", anchor="w")
+        self.nota4.place(x=20, y=110, width=135, height=23)
+        self.campoNota4 = tk.Entry(self)
+        self.campoNota4.place(x=105, y=110, width=135, height=23)
+
+        self.nota5 = tk.Label(self, text="Nota 5:", anchor="w")
+        self.nota5.place(x=20, y=140, width=135, height=23)
+        self.campoNota5 = tk.Entry(self)
+        self.campoNota5.place(x=105, y=140, width=135, height=23)
+
+        self.calcular = tk.Button(self, text="Calcular", command=self.actionPerformed_calcular)
+        self.calcular.place(x=20, y=170, width=100, height=23)
+
+        self.limpiar = tk.Button(self, text="Limpiar", command=self.actionPerformed_limpiar)
+        self.limpiar.place(x=125, y=170, width=80, height=23)
+
+        # Se amplía el ancho (width=240) para evitar que los resultados se corten en pantalla
+        self.promedio = tk.Label(self, text="Promedio = ", anchor="w")
+        self.promedio.place(x=20, y=210, width=240, height=23)
+
+        self.desviacion = tk.Label(self, text="Desviación = ", anchor="w")
+        self.desviacion.place(x=20, y=240, width=240, height=23)
+
+        self.mayor = tk.Label(self, text="Nota mayor = ", anchor="w")
+        self.mayor.place(x=20, y=270, width=240, height=23)
+
+        self.menor = tk.Label(self, text="Nota menor = ", anchor="w")
+        self.menor.place(x=20, y=300, width=240, height=23)
+
+    def actionPerformed_calcular(self):
+        notas = Notas()
+        campos = [
+            self.campoNota1, self.campoNota2, self.campoNota3,
+            self.campoNota4, self.campoNota5
+        ]
+
+        for i, campo in enumerate(campos):
+            texto = campo.get().strip()
+
+            # Ejercicio propuesto 2: Validar que la nota haya sido ingresada
+            if not texto:
+                messagebox.showwarning(
+                    "Campos incompletos",
+                    f"Es obligatorio ingresar las cinco notas. Falta la Nota {i + 1}."
+                )
+                campo.focus_set()
+                return
+
+            try:
+                valor = float(texto)
+                if not math.isfinite(valor):
+                    raise ValueError
+                notas.listaNotas[i] = valor
+            except ValueError:
+                messagebox.showwarning(
+                    "Error de formato",
+                    f"El valor ingresado en la Nota {i + 1} no es numérico."
+                )
+                campo.focus_set()
+                return
+
+        prom = notas.calcularPromedio()
+        desv = notas.calcularDesviacion()
+        may = notas.calcularMayor()
+        men = notas.calcularMenor()
+
+        self.promedio.config(text=f"Promedio = {prom:.2f}")
+        self.desviacion.config(text=f"Desviación estándar = {desv:.2f}")
+        self.mayor.config(text=f"Valor mayor = {may}")
+        self.menor.config(text=f"Valor menor = {men}")
+
+    def actionPerformed_limpiar(self):
+        self.campoNota1.delete(0, tk.END)
+        self.campoNota2.delete(0, tk.END)
+        self.campoNota3.delete(0, tk.END)
+        self.campoNota4.delete(0, tk.END)
+        self.campoNota5.delete(0, tk.END)
+
+        self.promedio.config(text="Promedio = ")
+        self.desviacion.config(text="Desviación = ")
+        self.mayor.config(text="Nota mayor = ")
+        self.menor.config(text="Nota menor = ")
+
+
+class Principal:
+    """
+    Clase que define el punto de ingreso al programa según el diagrama de clases.
+    """
+    @staticmethod
+    def main():
+        miVentanaPrincipal = VentanaPrincipal()
+        miVentanaPrincipal.mainloop()
+
+
+if __name__ == "__main__":
+    Principal.main()
